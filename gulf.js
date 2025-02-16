@@ -138,8 +138,8 @@
 		// Constants for special cases
 		const CHAR_CODE_SPACE = " ".charCodeAt(0)
 		const CHAR_CODE_CAPITAL_A = "A".charCodeAt(0)
-    const CHAR_CODE_PARENTH = '('.charCodeAt(0)
-    const CHAR_CODE_CAPITAL_G = 'G'.charCodeAt(0)
+		const CHAR_CODE_PARENTH = '('.charCodeAt(0)
+		const CHAR_CODE_CAPITAL_G = 'G'.charCodeAt(0)
 		const REPLACEMENT_BYTES = [..."Mexico\0"].map(char => char.charCodeAt(0))
 
 		// For every possible starting character in our `labelBytes` blob...
@@ -198,29 +198,29 @@
 				// (we can't just add a fixed value because we don't know how long the
 				// match even is, thanks to variable space matching)
 				const americaStartIndex = labelBytes.indexOf(CHAR_CODE_CAPITAL_A, labelByteStartingIndex)
-        let parenthStartIndex = -1;
-        // Check if the label is `Gulf of Mexico (Gulf of America)`
-        for (let i = 0; i < labelBytes.length; i++) {
-          if (labelBytes[i] == CHAR_CODE_PARENTH && labelBytes[i + 1] == CHAR_CODE_CAPITAL_G) {
-            parenthStartIndex = i
-            break
-          }
-        }
-        if (parenthStartIndex > -1) {
-          // Replace "(Gulf of" with null bytes
-          for (let i = 0; i < 8; i++) {
-            labelBytes[parenthStartIndex + i] = '\0'.charCodeAt(0)
-          }
-          // Replace "America)" with null bytes
-          for (let i = 0; i < 8; i++) {
-            labelBytes[americaStartIndex + i] = '\0'.charCodeAt(0)
-          }
-        } else {
-				  // Replace "America" with "Mexico\0"
-				  for (let i = 0; i < REPLACEMENT_BYTES.length; i++) {
-					  labelBytes[americaStartIndex + i] = REPLACEMENT_BYTES[i]
-          }
-        }
+				let parenthStartIndex = -1;
+				// Check if the label is `Gulf of Mexico (Gulf of America)`
+				for (let i = 0; i < labelBytes.length; i++) {
+					if (labelBytes[i] == CHAR_CODE_PARENTH && labelBytes[i + 1] == CHAR_CODE_CAPITAL_G) {
+						parenthStartIndex = i
+						break
+					}
+				}
+				if (parenthStartIndex > -1) {
+					// Replace "(Gulf of" with null bytes
+					for (let i = 0; i < 8; i++) {
+						labelBytes[parenthStartIndex + i] = '\0'.charCodeAt(0)
+					}
+					// Replace "America)" with null bytes
+					for (let i = 0; i < 8; i++) {
+						labelBytes[americaStartIndex + i] = '\0'.charCodeAt(0)
+					}
+				} else {
+					// Replace "America" with "Mexico\0"
+					for (let i = 0; i < REPLACEMENT_BYTES.length; i++) {
+						labelBytes[americaStartIndex + i] = REPLACEMENT_BYTES[i]
+					}
+				}
 			}
 
 		}
