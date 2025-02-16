@@ -1,5 +1,4 @@
 (() => {
-
 	/**
 	 * The functions we're patching are available globally on the variable named `_`,
 	 * but they have computer-generated names that change over time
@@ -10,7 +9,7 @@
 	 * on the actual contents of the function. This relies on calling
 	 * `toString()` on each function and seeing if it matches a
 	 * pre-defined version. This function returns the name of a function
-	 * matching that pre-defined versoin.
+	 * matching that pre-defined version.
 	 * 
 	 * This sounds awful, and maybe is, but the functions we're patching
 	 * are super short, and don't depend on any other computer-generated
@@ -35,7 +34,7 @@
 	 JSON-parsing related utility. This function
 	 is used in a couple places, one of them being parsing
 	 of JSON API requests. It's not the most direct place
-	 to hook, but it is probably the most convinient
+	 to hook, but it is probably the most convenient
 	 (meaning it is a global function that's close in
 	 execution to the spot we want to modify, without
 	 any other dependencies)
@@ -54,7 +53,7 @@
 	 and then calls out to the original function.
 	 */
 	_[jsonParsingFunctionName] = function(a, b) {
-		a = a.replaceAll('Gulf of America', 'Gulf of Mexico');
+		a = a.replaceAll(' (Gulf of America)', "").replaceAll('Gulf of America', 'Gulf of Mexico')
 		return originalJsonParsingFunction(a, b)
 	}
 
@@ -74,7 +73,7 @@
 
 	 Like the first function we're hooking, this one is not
 	 the most direct spot to hook (this one's not even)
-	 directly text-processing-related, but it is the most convinient.
+	 directly text-processing-related, but it is the most convenient.
 
 	 We hook this method in order to inspect the value returned
 	 by one of its functions. This value contains binary data
@@ -121,7 +120,7 @@
 	}
 
 	/**
-	 * Looks for "Gulf of America" in the given byte array and patches any occurances
+	 * Looks for "Gulf of America" in the given byte array and patches any occurrences
 	 * in-place to say "Gulf of Mexico" (with a trailing null byte, to make the strings
 	 * the same size).
 	 * 
@@ -139,7 +138,10 @@
 		// Constants for special cases
 		const CHAR_CODE_SPACE = " ".charCodeAt(0)
 		const CHAR_CODE_CAPITAL_A = "A".charCodeAt(0)
-		const REPLACEMENT_BYTES = [..."Mexico\0"].map(char => char.charCodeAt(0))
+		const CHAR_CODE_PARENTH = '('.charCodeAt(0)
+		const CHAR_CODE_CAPITAL_G = 'G'.charCodeAt(0)
+    // \u200B is a zero-width space character. We add it to make the strings the same length
+		const REPLACEMENT_BYTES = [..."Mexico\u200B"].map(char => char.charCodeAt(0))
 
 		// For every possible starting character in our `labelBytes` blob...
 		for(let labelByteStartingIndex = 0; labelByteStartingIndex < labelBytes.length; labelByteStartingIndex++) {
@@ -197,10 +199,28 @@
 				// (we can't just add a fixed value because we don't know how long the
 				// match even is, thanks to variable space matching)
 				const americaStartIndex = labelBytes.indexOf(CHAR_CODE_CAPITAL_A, labelByteStartingIndex)
-
-				// Replace "America" with "Mexico\0"
-				for (let i = 0; i < REPLACEMENT_BYTES.length; i++) {
-					labelBytes[americaStartIndex + i] = REPLACEMENT_BYTES[i];
+				let parenthStartIndex = -1;
+				// Check if the label is `Gulf of Mexico (Gulf of America)`
+				for (let i = 0; i < labelBytes.length; i++) {
+					if (labelBytes[i] == CHAR_CODE_PARENTH && labelBytes[i + 1] == CHAR_CODE_CAPITAL_G) {
+						parenthStartIndex = i
+						break
+					}
+				}
+				if (parenthStartIndex > -1) {
+					// Replace "(Gulf of" with zero-width spaces
+					for (let i = 0; i < 8; i++) {
+						labelBytes[parenthStartIndex + i] = '\u200B'.charCodeAt(0)
+					}
+					// Replace "America)" with zero-width spaces
+					for (let i = 0; i < 8; i++) {
+						labelBytes[americaStartIndex + i] = '\u200B'.charCodeAt(0)
+					}
+				} else {
+					// Replace "America" with "Mexico\u200B"
+					for (let i = 0; i < REPLACEMENT_BYTES.length; i++) {
+						labelBytes[americaStartIndex + i] = REPLACEMENT_BYTES[i]
+					}
 				}
 			}
 
