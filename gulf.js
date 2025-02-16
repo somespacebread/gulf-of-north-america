@@ -1,5 +1,4 @@
 (() => {
-
 	/**
 	 * The functions we're patching are available globally on the variable named `_`,
 	 * but they have computer-generated names that change over time
@@ -10,7 +9,7 @@
 	 * on the actual contents of the function. This relies on calling
 	 * `toString()` on each function and seeing if it matches a
 	 * pre-defined version. This function returns the name of a function
-	 * matching that pre-defined versoin.
+	 * matching that pre-defined version.
 	 * 
 	 * This sounds awful, and maybe is, but the functions we're patching
 	 * are super short, and don't depend on any other computer-generated
@@ -35,7 +34,7 @@
 	 JSON-parsing related utility. This function
 	 is used in a couple places, one of them being parsing
 	 of JSON API requests. It's not the most direct place
-	 to hook, but it is probably the most convinient
+	 to hook, but it is probably the most convenient
 	 (meaning it is a global function that's close in
 	 execution to the spot we want to modify, without
 	 any other dependencies)
@@ -74,7 +73,7 @@
 
 	 Like the first function we're hooking, this one is not
 	 the most direct spot to hook (this one's not even)
-	 directly text-processing-related, but it is the most convinient.
+	 directly text-processing-related, but it is the most convenient.
 
 	 We hook this method in order to inspect the value returned
 	 by one of its functions. This value contains binary data
@@ -121,7 +120,7 @@
 	}
 
 	/**
-	 * Looks for "Gulf of America" in the given byte array and patches any occurances
+	 * Looks for "Gulf of America" in the given byte array and patches any occurrences
 	 * in-place to say "Gulf of Mexico" (with a trailing null byte, to make the strings
 	 * the same size).
 	 * 
