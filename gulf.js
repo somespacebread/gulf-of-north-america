@@ -140,7 +140,8 @@
 		const CHAR_CODE_CAPITAL_A = "A".charCodeAt(0)
 		const CHAR_CODE_PARENTH = '('.charCodeAt(0)
 		const CHAR_CODE_CAPITAL_G = 'G'.charCodeAt(0)
-		const REPLACEMENT_BYTES = [..."Mexico\0"].map(char => char.charCodeAt(0))
+    // \u200B is a zero-width space character. We add it to make the strings the same length
+		const REPLACEMENT_BYTES = [..."Mexico\u200B"].map(char => char.charCodeAt(0))
 
 		// For every possible starting character in our `labelBytes` blob...
 		for(let labelByteStartingIndex = 0; labelByteStartingIndex < labelBytes.length; labelByteStartingIndex++) {
@@ -207,16 +208,16 @@
 					}
 				}
 				if (parenthStartIndex > -1) {
-					// Replace "(Gulf of" with null bytes
+					// Replace "(Gulf of" with zero-width spaces
 					for (let i = 0; i < 8; i++) {
-						labelBytes[parenthStartIndex + i] = '\0'.charCodeAt(0)
+						labelBytes[parenthStartIndex + i] = '\u200B'.charCodeAt(0)
 					}
-					// Replace "America)" with null bytes
+					// Replace "America)" with zero-width spaces
 					for (let i = 0; i < 8; i++) {
-						labelBytes[americaStartIndex + i] = '\0'.charCodeAt(0)
+						labelBytes[americaStartIndex + i] = '\u200B'.charCodeAt(0)
 					}
 				} else {
-					// Replace "America" with "Mexico\0"
+					// Replace "America" with "Mexico\u200B"
 					for (let i = 0; i < REPLACEMENT_BYTES.length; i++) {
 						labelBytes[americaStartIndex + i] = REPLACEMENT_BYTES[i]
 					}
